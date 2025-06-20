@@ -58,7 +58,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
 
     return {
       user,
-      token: 'ABC',
+      token: await this.signJWT(user),
     };
   }
 
