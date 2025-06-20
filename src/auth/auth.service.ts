@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
 import { compareSync, hashSync } from 'bcrypt';
 import { PrismaClient } from 'generated/prisma';
+import { envs } from 'src/config/envs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -96,5 +99,24 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         email,
       }),
     };
+  }
+
+  async verifyToken(token: string) {
+    try {
+      const { sub, iat, exp, ...user } = this.jwtService.verify(token, {
+        secret: envs.JWT_SECRET,
+      });
+
+      return {
+        user,
+        token: await this.signJWT(user),
+      };
+    } catch (error) {
+      console.error(error);
+      throw new RpcException({
+        status: 401,
+        message: 'invalid token',
+      });
+    }
   }
 }
