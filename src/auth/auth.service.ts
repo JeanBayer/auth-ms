@@ -20,7 +20,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
 
   async onModuleInit() {
     await this.$connect();
-    this.logger.log('Prisma Client connected');
+    this.logger.log('Prisma Client connected!');
   }
 
   async signJWT(payload: JwtPayload) {
